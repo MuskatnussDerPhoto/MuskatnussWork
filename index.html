@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FORGE v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0b0b0f;--surf:#11111a;--card:#17171f;--card2:#1d1d28;
+  --b:#232332;--acc:#ff3b1e;--acc2:#ff9800;--txt:#eeeef4;
+  --mut:#60607a;--ok:#00e676;--beg:#3ecf60;--int:#ff9800;--exp:#ff3b1e;
+  --rr:12px;--rs:7px;--fh:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh}
+
+/* NAV */
+.hdr{background:var(--surf);border-bottom:1px solid var(--b);padding:13px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:300}
+.logo{font-family:var(--fh);font-size:28px;letter-spacing:4px;color:var(--acc)}
+.logo span{color:var(--txt)}
+.hdr-sub{font-size:10px;color:var(--mut);letter-spacing:2px;text-transform:uppercase}
+.tnav{display:flex;background:var(--surf);border-bottom:1px solid var(--b);
+  position:sticky;top:55px;z-index:299}
+.tb{flex:1;padding:12px 4px;border:none;background:transparent;color:var(--mut);
+  font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .18s}
+.tb.on{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* LAYOUT */
+.main{max-width:520px;margin:0 auto;padding:18px 14px 56px}
+.tab{display:none}.tab.on{display:block}
+.sh{font-family:var(--fh);font-size:22px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.ss{font-size:12px;color:var(--mut);margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--b);border-radius:var(--rr);padding:16px;margin-bottom:12px}
+
+/* LEVEL */
+.lv{display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.lv-b{background:rgba(62,207,96,.12);color:var(--beg);border:1px solid rgba(62,207,96,.25)}
+.lv-i{background:rgba(255,152,0,.12);color:var(--int);border:1px solid rgba(255,152,0,.25)}
+.lv-e{background:rgba(255,59,30,.12);color:var(--exp);border:1px solid rgba(255,59,30,.25)}
+
+/* TEMPLATE CARDS */
+.tc{background:var(--card);border:1px solid var(--b);border-radius:var(--rr);
+  padding:18px;margin-bottom:12px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+.tc:hover{border-color:rgba(255,59,30,.5);transform:translateY(-1px)}
+.tc-icon{font-size:26px;margin-bottom:7px}
+.tc-name{font-family:var(--fh);font-size:20px;letter-spacing:1.5px;text-transform:uppercase}
+.tc-desc{font-size:12px;color:var(--mut);margin:4px 0 10px}
+.tc-meta{display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:11px;padding:3px 9px;background:var(--card2);border-radius:20px;font-weight:500}
+
+/* CUSTOM BUILDER */
+.cbuilder{background:var(--card);border:2px dashed rgba(255,59,30,.3);border-radius:var(--rr);
+  padding:18px;margin-bottom:12px;cursor:pointer;transition:all .18s;text-align:center}
+.cbuilder:hover{border-color:var(--acc);background:rgba(255,59,30,.04)}
+.cbuilder-icon{font-size:28px;margin-bottom:6px}
+.cbuilder-name{font-family:var(--fh);font-size:20px;letter-spacing:2px;color:var(--acc)}
+.cbuilder-desc{font-size:12px;color:var(--mut);margin-top:4px}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none}
+.fbar::-webkit-scrollbar{display:none}
+.fchip{flex-shrink:0;font-size:11px;font-weight:600;padding:7px 14px;border:1px solid var(--b);
+  background:var(--card);border-radius:20px;cursor:pointer;transition:all .18s;white-space:nowrap;color:var(--mut)}
+.fchip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* EXERCISE CARD */
+.ec{background:var(--card);border:1px solid var(--b);border-radius:var(--rr);
+  margin-bottom:10px;overflow:hidden;transition:border-color .18s}
+.ec:hover{border-color:rgba(255,59,30,.35)}
+.ec-hdr{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer}
+.ec-emoji{font-size:22px;flex-shrink:0}
+.ec-info{flex:1;min-width:0}
+.ec-name{font-family:var(--fh);font-size:17px;letter-spacing:1px;text-transform:uppercase}
+.ec-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.mtag{font-size:10px;padding:2px 7px;background:var(--card2);border-radius:10px;color:var(--mut);font-weight:500}
+.ec-arr{color:var(--mut);transition:transform .2s;flex-shrink:0;font-size:18px}
+.ec.open .ec-arr{transform:rotate(90deg)}
+.ec-body{display:none;border-top:1px solid var(--b);padding:16px 15px}
+.ec.open .ec-body{display:block}
+
+/* MUSCLE DIAGRAM */
+.diag-wrap{background:var(--card2);border-radius:var(--rs);padding:12px;margin-bottom:14px;
+  display:flex;justify-content:center;gap:24px;align-items:flex-start}
+.diag-side{text-align:center}
+.diag-lbl{font-size:9px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;font-weight:600}
+.diag-legend{display:flex;justify-content:center;gap:14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--b)}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mut)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* GIF CONTAINER */
+.gif-wrap{border-radius:var(--rs);overflow:hidden;margin-bottom:14px;background:var(--card2);
+  min-height:200px;display:flex;align-items:center;justify-content:center;position:relative}
+.gif-wrap img{width:100%;height:auto;display:block;border-radius:var(--rs)}
+.gif-loading{display:flex;flex-direction:column;align-items:center;gap:10px;padding:30px}
+.gif-spinner{width:32px;height:32px;border:2px solid var(--b);border-top-color:var(--acc);
+  border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gif-lbl{font-size:12px;color:var(--mut)}
+.gif-err{text-align:center;padding:24px;font-size:13px;color:var(--mut)}
+.gif-src{font-size:9px;color:var(--mut);text-align:right;padding:4px 6px 0;opacity:.6}
+
+/* EXERCISE BODY */
+.ex-desc{font-size:13px;color:#9898b8;line-height:1.7;margin-bottom:10px}
+.ex-tip{background:rgba(255,59,30,.06);border-left:3px solid var(--acc);
+  padding:8px 12px;border-radius:0 6px 6px 0;font-size:12px;color:var(--acc);line-height:1.5;margin-bottom:12px}
+.sets-info{font-size:12px;color:var(--mut);margin-bottom:10px;font-weight:500}
+.btn-yt{width:100%;background:#cc0000;border:none;color:#fff;border-radius:var(--rs);
+  padding:11px;font-family:var(--fb);font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;transition:opacity .18s}
+.btn-yt:hover{opacity:.85}
+.btn-add{width:100%;background:var(--acc);border:none;color:#fff;margin-top:10px;
+  font-family:var(--fh);font-size:15px;letter-spacing:2px;padding:12px;
+  border-radius:var(--rs);cursor:pointer;transition:opacity .18s}
+.btn-add:hover{opacity:.85}
+.btn-add.added{background:var(--ok);color:#000}
+
+/* SECTION DIVIDER */
+.sec-div{font-size:10px;color:var(--mut);letter-spacing:2px;text-transform:uppercase;
+  font-weight:600;padding:10px 0 6px;border-bottom:1px solid var(--b);margin-bottom:12px}
+
+/* BACK BTN */
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--card);
+  border:1px solid var(--b);color:var(--txt);border-radius:var(--rs);padding:9px 13px;
+  font-size:13px;cursor:pointer;margin-bottom:16px;transition:border-color .18s}
+.back-btn:hover{border-color:var(--acc)}
+
+/* SESSION */
+.prog-box{background:var(--card);border:1px solid var(--b);border-radius:var(--rr);padding:13px 15px;margin-bottom:16px}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:7px}
+.prog-n{font-family:var(--fh);font-size:22px;color:var(--acc)}
+.prog-bg{background:var(--b);border-radius:4px;height:5px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:4px;transition:width .3s}
+.sx-card{background:var(--card);border:1px solid var(--b);border-radius:var(--rr);margin-bottom:12px;overflow:hidden}
+.sx-card.done-c{border-color:var(--ok)}
+.sx-head{display:flex;align-items:center;gap:10px;padding:13px 15px;cursor:pointer}
+.sx-num{font-family:var(--fh);font-size:26px;color:rgba(255,59,30,.3);flex-shrink:0;width:26px}
+.sx-name{font-family:var(--fh);font-size:17px;letter-spacing:1px;text-transform:uppercase;flex:1}
+.sx-body{display:none;border-top:1px solid var(--b);padding:14px 15px}
+.sx-card.open .sx-body{display:block}
+.sets-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.set-chip{flex:1;min-width:60px;background:var(--card2);border:1px solid var(--b);
+  border-radius:var(--rs);padding:10px 6px;text-align:center;cursor:pointer;transition:all .18s;user-select:none}
+.set-chip:hover{border-color:var(--acc)}
+.set-chip.on{background:rgba(0,230,118,.1);border-color:var(--ok);color:var(--ok)}
+.set-lbl{font-size:9px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.set-val{font-family:var(--fh);font-size:15px}
+.sx-actions{display:flex;gap:8px}
+.btn-yt-sm{flex:1;background:#cc0000;border:none;color:#fff;border-radius:var(--rs);
+  padding:10px;font-family:var(--fb);font-size:12px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .18s;text-decoration:none}
+.btn-yt-sm:hover{opacity:.85}
+.btn-rest{background:var(--card2);border:1px solid var(--b);color:var(--txt);
+  border-radius:var(--rs);padding:10px 14px;font-size:12px;cursor:pointer;transition:border-color .18s;white-space:nowrap}
+.btn-rest:hover{border-color:var(--acc)}
+.done-banner{background:linear-gradient(135deg,var(--ok),#00c853);color:#000;
+  border-radius:var(--rr);padding:20px;text-align:center;margin-bottom:16px;display:none}
+.done-banner h2{font-family:var(--fh);font-size:26px;letter-spacing:3px;margin-bottom:4px}
+.done-banner p{font-size:13px}
+
+/* TIMER */
+.timer-box{background:var(--card);border:1px solid var(--b);border-radius:var(--rr);
+  padding:36px 20px;text-align:center;margin-bottom:16px}
+.t-lbl{font-size:10px;color:var(--mut);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.t-num{font-family:var(--fh);font-size:88px;color:var(--acc);letter-spacing:-2px;line-height:1;transition:color .25s}
+.t-stat{font-size:12px;color:var(--mut);margin-top:8px;min-height:18px}
+.pre-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.pre-btn{background:var(--card);border:1px solid var(--b);color:var(--txt);
+  border-radius:var(--rs);padding:13px 6px;text-align:center;cursor:pointer;
+  transition:all .18s;font-family:var(--fh);font-size:18px}
+.pre-btn:hover,.pre-btn.on{border-color:var(--acc);color:var(--acc)}
+.pre-sub{font-family:var(--fb);font-size:10px;color:var(--mut);margin-top:2px}
+.t-btns{display:flex;gap:10px}
+.btn-primary{flex:1;background:var(--acc);color:#fff;border:none;border-radius:var(--rs);
+  padding:15px;font-family:var(--fh);font-size:17px;letter-spacing:2px;cursor:pointer;transition:opacity .18s}
+.btn-primary:hover{opacity:.85}
+.btn-sec{background:var(--card);border:1px solid var(--b);color:var(--txt);
+  border-radius:var(--rs);padding:15px 18px;font-size:18px;cursor:pointer;transition:border-color .18s}
+.btn-sec:hover{border-color:var(--acc)}
+
+/* SEL INDICATOR */
+.sel-mark{font-size:18px;margin-left:auto}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">FORGE <span>⚡</span></div>
+  <div class="hdr-sub">Workout Planner</div>
+</div>
+<div class="tnav">
+  <button class="tb on" onclick="tab('templates',this)">Templates</button>
+  <button class="tb" onclick="tab('library',this)">Library</button>
+  <button class="tb" onclick="tab('session',this)">Session</button>
+  <button class="tb" onclick="tab('timer',this)">Timer</button>
+</div>
+
+<div class="main">
+
+<!-- ══ TEMPLATES ══ -->
+<div class="tab on" id="tab-templates">
+  <div id="tmpl-list">
+    <div class="sh">Programs</div>
+    <div class="ss">Pre-built templates or build your own</div>
+
+    <div class="cbuilder" onclick="openBuilder()">
+      <div class="cbuilder-icon">➕</div>
+      <div class="cbuilder-name">Build Custom Workout</div>
+      <div class="cbuilder-desc">Pick any exercises from the library</div>
+    </div>
+
+    <div class="sec-div">Base Programs</div>
+    <div class="tc" onclick="previewTemplate('beg3')">
+      <div class="tc-icon">🌱</div>
+      <div class="tc-name">3-Day Beginner</div>
+      <div class="tc-desc">Push / Lower / Pull — bodyweight + light dumbbells</div>
+      <div class="tc-meta"><span class="lv lv-b chip">Beginner</span><span class="chip">3 Days</span></div>
+    </div>
+    <div class="tc" onclick="previewTemplate('int3')">
+      <div class="tc-icon">⚡</div>
+      <div class="tc-name">3-Day Intermediate</div>
+      <div class="tc-desc">Step up with compound dumbbell movements</div>
+      <div class="tc-meta"><span class="lv lv-i chip">Intermediate</span><span class="chip">3 Days</span></div>
+    </div>
+    <div class="tc" onclick="previewTemplate('exp3')">
+      <div class="tc-icon">🔥</div>
+      <div class="tc-name">3-Day Expert</div>
+      <div class="tc-desc">Max difficulty — explosive + compound lifts</div>
+      <div class="tc-meta"><span class="lv lv-e chip">Expert</span><span class="chip">3 Days</span></div>
+    </div>
+
+    <div class="sec-div">Body Part Splits</div>
+    <div class="tc" onclick="previewTemplate('chest')"><div class="tc-icon">💪</div><div class="tc-name">Chest Day</div><div class="tc-desc">5 exercises · push variations + DB work</div></div>
+    <div class="tc" onclick="previewTemplate('back')"><div class="tc-icon">🦅</div><div class="tc-name">Back Day</div><div class="tc-desc">5 exercises · rows and hinges</div></div>
+    <div class="tc" onclick="previewTemplate('legs')"><div class="tc-icon">🦵</div><div class="tc-name">Leg Day</div><div class="tc-desc">6 exercises · quads, glutes, hamstrings</div></div>
+    <div class="tc" onclick="previewTemplate('shoulders')"><div class="tc-icon">⬆️</div><div class="tc-name">Shoulder Day</div><div class="tc-desc">4 exercises · presses and raises</div></div>
+    <div class="tc" onclick="previewTemplate('arms')"><div class="tc-icon">🏋️</div><div class="tc-name">Arms Day</div><div class="tc-desc">6 exercises · biceps + triceps</div></div>
+    <div class="tc" onclick="previewTemplate('core')"><div class="tc-icon">🎯</div><div class="tc-name">Core Day</div><div class="tc-desc">6 exercises · every ab angle covered</div></div>
+    <div class="tc" onclick="previewTemplate('fullbody')"><div class="tc-icon">🌊</div><div class="tc-name">Full Body</div><div class="tc-desc">6 exercises · hit everything in one session</div></div>
+    <div class="tc" onclick="previewTemplate('cardio')"><div class="tc-icon">🏃</div><div class="tc-name">Cardio HIIT</div><div class="tc-desc">5 exercises · max burn and conditioning</div></div>
+  </div>
+
+  <!-- TEMPLATE PREVIEW -->
+  <div id="tmpl-preview" style="display:none">
+    <button class="back-btn" onclick="closeTmplPreview()">← Back</button>
+    <div class="sh" id="prev-title"></div>
+    <div class="ss" id="prev-sub"></div>
+    <div id="prev-days"></div>
+  </div>
+</div>
+
+<!-- ══ LIBRARY ══ -->
+<div class="tab" id="tab-library">
+  <div class="sh">Exercise Library</div>
+  <div class="ss">40 exercises — tap to expand, see muscle diagram & demo GIF</div>
+  <div class="fbar">
+    <div class="fchip on" onclick="filterLib('all',this)">All</div>
+    <div class="fchip" onclick="filterLib('chest',this)">Chest</div>
+    <div class="fchip" onclick="filterLib('back',this)">Back</div>
+    <div class="fchip" onclick="filterLib('legs',this)">Legs</div>
+    <div class="fchip" onclick="filterLib('shoulders',this)">Shoulders</div>
+    <div class="fchip" onclick="filterLib('arms',this)">Arms</div>
+    <div class="fchip" onclick="filterLib('core',this)">Core</div>
+    <div class="fchip" onclick="filterLib('fullbody',this)">Full Body</div>
+    <div class="fchip" onclick="filterLib('cardio',this)">Cardio</div>
+    <div class="fchip" onclick="filterLib('beginner',this)">Beginner</div>
+    <div class="fchip" onclick="filterLib('intermediate',this)">Intermediate</div>
+    <div class="fchip" onclick="filterLib('expert',this)">Expert</div>
+  </div>
+  <div id="lib-list"></div>
+</div>
+
+<!-- ══ SESSION ══ -->
+<div class="tab" id="tab-session">
+  <div id="sess-empty" style="text-align:center;padding:60px 20px">
+    <div style="font-size:52px;margin-bottom:14px">🏋️</div>
+    <div class="sh">No Active Session</div>
+    <div class="ss">Pick a template or build a custom workout</div>
+    <button onclick="tab('templates',document.querySelectorAll('.tb')[0])"
+      style="background:var(--acc);border:none;color:#fff;font-family:var(--fh);
+      font-size:16px;letter-spacing:2px;padding:14px 24px;border-radius:var(--rs);cursor:pointer">
+      BROWSE TEMPLATES
+    </button>
+  </div>
+  <div id="sess-active" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div>
+        <div class="sh" id="sess-title" style="margin-bottom:0"></div>
+        <div style="font-size:12px;color:var(--mut)" id="sess-sub"></div>
+      </div>
+      <button onclick="endSession()" style="background:none;border:1px solid var(--b);color:var(--mut);
+        border-radius:var(--rs);padding:6px 10px;font-size:12px;cursor:pointer">End</button>
+    </div>
+    <div class="done-banner" id="done-banner">
+      <h2>WORKOUT DONE! 🎉</h2>
+      <p>Great session. Recover well and come back stronger.</p>
+    </div>
+    <div class="prog-box">
+      <div class="prog-row">
+        <span style="font-size:12px;color:var(--mut);font-weight:500">Progress</span>
+        <span class="prog-n" id="prog-pct">0%</span>
+      </div>
+      <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0"></div></div>
+    </div>
+    <div id="sess-exercises"></div>
+  </div>
+</div>
+
+<!-- ══ TIMER ══ -->
+<div class="tab" id="tab-timer">
+  <div class="sh">Rest Timer</div>
+  <div class="ss">60–90 sec rest between sets for muscle growth</div>
+  <div class="timer-box">
+    <div class="t-lbl">Rest Remaining</div>
+    <div class="t-num" id="t-num">01:30</div>
+    <div class="t-stat" id="t-stat">Ready</div>
+  </div>
+  <div class="pre-grid">
+    <div class="pre-btn" onclick="setPre(30,this)">0:30<div class="pre-sub">Quick</div></div>
+    <div class="pre-btn" onclick="setPre(60,this)">1:00<div class="pre-sub">Standard</div></div>
+    <div class="pre-btn on" onclick="setPre(90,this)">1:30<div class="pre-sub">Default ✓</div></div>
+    <div class="pre-btn" onclick="setPre(120,this)">2:00<div class="pre-sub">Extended</div></div>
+    <div class="pre-btn" onclick="setPre(180,this)">3:00<div class="pre-sub">Heavy</div></div>
+    <div class="pre-btn" onclick="setPre(300,this)">5:00<div class="pre-sub">Max</div></div>
+  </div>
+  <div class="t-btns">
+    <button class="btn-primary" id="t-btn" onclick="toggleTimer()">START</button>
+    <button class="btn-sec" onclick="resetTimer()">↺</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════
+// GIPHY — free public demo key (rate limited but fine for personal use)
+// GIFs load as plain <img> tags — no iframe blocking possible
+// ═══════════════════════════════════════════
+const GIPHY_KEY = 'dc6zaTOxFJmzC';
+const gifCache = {};
+
+async function fetchGif(query, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  if (gifCache[query]) {
+    el.innerHTML = `<img src="${gifCache[query]}" alt="${query}" style="width:100%;border-radius:var(--rs)">
+      <div class="gif-src">via Giphy</div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="gif-loading">
+    <div class="gif-spinner"></div>
+    <div class="gif-lbl">Loading exercise demo…</div>
+  </div>`;
+
+  try {
+    const r = await fetch(
+      `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(query)}&limit=5&rating=g&lang=en`
+    );
+    const d = await r.json();
+    // Pick first GIF that has a decent size
+    const gif = d.data?.find(g => g.images?.downsized_medium?.url) || d.data?.[0];
+    if (gif) {
+      const url = gif.images?.downsized_medium?.url || gif.images?.fixed_height?.url || gif.images?.original?.url;
+      gifCache[query] = url;
+      el.innerHTML = `<img src="${url}" alt="${query}" style="width:100%;border-radius:var(--rs);display:block">
+        <div class="gif-src">via Giphy · ${gif.title}</div>`;
+    } else {
+      el.innerHTML = `<div class="gif-err">😅 No GIF found.<br>Try the YouTube link below.</div>`;
+    }
+  } catch(e) {
+    el.innerHTML = `<div class="gif-err">⚡ Couldn't load GIF.<br>Check your internet connection.</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+// EXERCISE DATABASE — 40 exercises
+// ytSearch = YouTube search URL (opens new tab, never blocked)
+// gifQ     = Giphy search query
+// ═══════════════════════════════════════════
+const EX = {
+  push_up:{id:'push_up',name:'Push-Up',cat:'chest',level:'beginner',equip:'bodyweight',emoji:'💪',
+    p:['chest','triceps'],s:['shoulders','core'],sets:3,reps:'10–12',rest:60,
+    gifQ:'push up exercise workout',ytSearch:'push up proper form tutorial',
+    desc:'Hands shoulder-width, body rigid plank. Lower chest toward floor, elbows at 45°. Press back up explosively.',
+    tip:'Can\'t do full reps? Start on your knees — same pattern, same gains.'},
+  wide_push_up:{id:'wide_push_up',name:'Wide Push-Up',cat:'chest',level:'beginner',equip:'bodyweight',emoji:'↔️',
+    p:['chest'],s:['shoulders','triceps'],sets:3,reps:'10–12',rest:60,
+    gifQ:'wide push up chest workout',ytSearch:'wide push up chest workout form',
+    desc:'Hands wider than shoulders. Greater chest stretch at bottom. Press through the width.',
+    tip:'Wider hands = more pec stretch. Feel that pull at the bottom.'},
+  diamond_push_up:{id:'diamond_push_up',name:'Diamond Push-Up',cat:'chest',level:'intermediate',equip:'bodyweight',emoji:'💎',
+    p:['triceps','chest'],s:['shoulders'],sets:3,reps:'8–10',rest:90,
+    gifQ:'diamond push up exercise',ytSearch:'diamond push up triceps form',
+    desc:'Hands together under chest forming a diamond shape. Lower slowly, press to lockout.',
+    tip:'Go slower than you think — this exposes any weakness fast.'},
+  db_floor_press:{id:'db_floor_press',name:'DB Floor Press',cat:'chest',level:'intermediate',equip:'dumbbell',emoji:'🛏️',
+    p:['chest','triceps'],s:['shoulders'],sets:3,reps:'10–12',rest:90,
+    gifQ:'dumbbell floor press chest exercise',ytSearch:'dumbbell floor press chest exercise form',
+    desc:'Lie on back, dumbbells at chest. Press to full extension, lower until upper arms rest on floor. Each rep starts fresh.',
+    tip:'Drive the dumbbells toward each other at the top for peak contraction.'},
+  db_chest_fly:{id:'db_chest_fly',name:'DB Chest Fly',cat:'chest',level:'intermediate',equip:'dumbbell',emoji:'🦋',
+    p:['chest'],s:['shoulders'],sets:3,reps:'12–15',rest:60,
+    gifQ:'dumbbell chest fly exercise',ytSearch:'dumbbell chest fly lying down form',
+    desc:'Lie on back, arms wide with slight elbow bend. Open wide for stretch, squeeze arms back together in arc.',
+    tip:'Think "hugging a tree" — arc motion, not a press.'},
+  inverted_row:{id:'inverted_row',name:'Inverted Row',cat:'back',level:'beginner',equip:'bodyweight',emoji:'🔄',
+    p:['back','biceps'],s:['rear_delt','core'],sets:3,reps:'8–12',rest:90,
+    gifQ:'inverted row table bodyweight exercise',ytSearch:'inverted row table back exercise form',
+    desc:'Under a sturdy table, grip edge, body straight. Pull chest up retracting shoulder blades first.',
+    tip:'More horizontal body = harder. Elevate feet on a chair to progress.'},
+  superman:{id:'superman',name:'Superman Hold',cat:'back',level:'beginner',equip:'bodyweight',emoji:'🦸',
+    p:['lower_back','glutes'],s:['hamstrings'],sets:3,reps:'12',rest:60,
+    gifQ:'superman exercise back workout',ytSearch:'superman exercise lower back form',
+    desc:'Lie face down, arms extended. Lift arms, chest and legs simultaneously. Squeeze hard at peak, hold 2 sec.',
+    tip:'Feel your lower back and glutes contract — don\'t just throw your limbs up.'},
+  db_row:{id:'db_row',name:'Single-Arm DB Row',cat:'back',level:'beginner',equip:'dumbbell',emoji:'🚣',
+    p:['back','biceps'],s:['core'],sets:3,reps:'10–12 each',rest:60,
+    gifQ:'dumbbell single arm row back exercise',ytSearch:'single arm dumbbell row proper form',
+    desc:'One knee on chair for support. Pull dumbbell to hip, squeezing shoulder blade at top.',
+    tip:'Lead with your elbow, not your hand. Squeeze at the top for 1 sec.'},
+  db_rdl:{id:'db_rdl',name:'DB Romanian Deadlift',cat:'back',level:'intermediate',equip:'dumbbell',emoji:'⬇️',
+    p:['hamstrings','glutes','lower_back'],s:['back'],sets:3,reps:'10–12',rest:90,
+    gifQ:'romanian deadlift dumbbell exercise',ytSearch:'dumbbell romanian deadlift proper form',
+    desc:'Hinge at hips pushing them back, dumbbells down legs. Feel hamstring stretch. Drive hips forward to stand.',
+    tip:'This is a HINGE not a squat. Push hips back like touching a wall behind you.'},
+  good_morning:{id:'good_morning',name:'Good Morning',cat:'back',level:'beginner',equip:'bodyweight',emoji:'🌅',
+    p:['lower_back','hamstrings'],s:['glutes'],sets:3,reps:'15',rest:60,
+    gifQ:'good morning exercise bodyweight workout',ytSearch:'good morning exercise bodyweight lower back form',
+    desc:'Hands behind head. Hinge at hips, lower torso toward floor with flat back. Return to standing.',
+    tip:'Feel the hamstring stretch on the way down — that\'s the goal.'},
+  squat:{id:'squat',name:'Bodyweight Squat',cat:'legs',level:'beginner',equip:'bodyweight',emoji:'🪑',
+    p:['quads','glutes'],s:['hamstrings','core'],sets:3,reps:'15',rest:60,
+    gifQ:'squat exercise bodyweight workout',ytSearch:'bodyweight squat proper form beginner',
+    desc:'Feet shoulder-width, toes slightly out. Sit back and down chest tall. Drive through heels to stand.',
+    tip:'Heels lifting? Widen stance or work on ankle mobility.'},
+  reverse_lunge:{id:'reverse_lunge',name:'Reverse Lunge',cat:'legs',level:'beginner',equip:'bodyweight',emoji:'🚶',
+    p:['quads','glutes'],s:['hamstrings'],sets:3,reps:'10 each',rest:60,
+    gifQ:'reverse lunge exercise workout',ytSearch:'reverse lunge proper form beginner',
+    desc:'Step one foot back, lower rear knee toward floor. Front thigh parallel. Push through front heel.',
+    tip:'Step far enough back so front knee stays over ankle.'},
+  glute_bridge:{id:'glute_bridge',name:'Glute Bridge',cat:'legs',level:'beginner',equip:'bodyweight',emoji:'🌉',
+    p:['glutes','hamstrings'],s:['lower_back','core'],sets:3,reps:'15–20',rest:60,
+    gifQ:'glute bridge exercise workout',ytSearch:'glute bridge exercise proper form',
+    desc:'Lie on back, knees bent. Drive hips up squeezing glutes hard. Hold 1–2 sec at peak. Lower slowly.',
+    tip:'The pause at the top is where the growth happens.'},
+  calf_raise:{id:'calf_raise',name:'Calf Raise',cat:'legs',level:'beginner',equip:'bodyweight',emoji:'🦶',
+    p:['calves'],s:[],sets:3,reps:'20–25',rest:45,
+    gifQ:'calf raise exercise workout standing',ytSearch:'calf raise step edge form',
+    desc:'Rise up on toes as high as possible. Brief hold at peak. Lower slowly — below neutral on a step.',
+    tip:'Calves love high reps and slow tempo. No bouncing.'},
+  sumo_squat:{id:'sumo_squat',name:'Sumo Squat',cat:'legs',level:'beginner',equip:'bodyweight',emoji:'🤼',
+    p:['glutes','inner_thigh','quads'],s:['hamstrings'],sets:3,reps:'15',rest:60,
+    gifQ:'sumo squat exercise workout wide stance',ytSearch:'sumo squat form glutes',
+    desc:'Wide stance, toes out 45°. Squat down between legs, chest tall. Drive through heels.',
+    tip:'The wide stance targets inner thighs and glutes more than regular squats.'},
+  goblet_squat:{id:'goblet_squat',name:'DB Goblet Squat',cat:'legs',level:'intermediate',equip:'dumbbell',emoji:'🏆',
+    p:['quads','glutes'],s:['core','hamstrings'],sets:3,reps:'12',rest:90,
+    gifQ:'goblet squat dumbbell exercise',ytSearch:'goblet squat dumbbell form',
+    desc:'Hold dumbbell at chest. Squat down between elbows. Front load allows deeper squat.',
+    tip:'Let elbows push knees out at the bottom. Deepest squat you can manage with flat back.'},
+  jump_squat:{id:'jump_squat',name:'Jump Squat',cat:'legs',level:'intermediate',equip:'bodyweight',emoji:'🦘',
+    p:['quads','glutes'],s:['calves','core'],sets:3,reps:'10–12',rest:90,
+    gifQ:'jump squat exercise explosive workout',ytSearch:'jump squat explosive form',
+    desc:'Squat down, explode upward as high as possible. Land softly with bent knees.',
+    tip:'Land like a cat — soft, quiet, controlled. Loud landing = hard on joints.'},
+  pike_pushup:{id:'pike_pushup',name:'Pike Push-Up',cat:'shoulders',level:'beginner',equip:'bodyweight',emoji:'🔺',
+    p:['shoulders'],s:['triceps','chest'],sets:3,reps:'8–10',rest:90,
+    gifQ:'pike push up shoulder exercise',ytSearch:'pike push up shoulder form tutorial',
+    desc:'Inverted-V, hips high. Bend elbows lowering head toward floor. Press back up.',
+    tip:'Foundation of handstand push-ups. Elevate feet to progress.'},
+  db_shoulder_press:{id:'db_shoulder_press',name:'DB Shoulder Press',cat:'shoulders',level:'beginner',equip:'dumbbell',emoji:'☝️',
+    p:['shoulders'],s:['triceps','upper_back'],sets:3,reps:'10–12',rest:90,
+    gifQ:'dumbbell shoulder press standing exercise',ytSearch:'dumbbell shoulder press standing form',
+    desc:'Dumbbells at shoulder height. Press overhead to full extension. Lower slowly.',
+    tip:'Brace your core hard — don\'t arch lower back to push.'},
+  lateral_raise:{id:'lateral_raise',name:'DB Lateral Raise',cat:'shoulders',level:'beginner',equip:'dumbbell',emoji:'↕️',
+    p:['shoulders'],s:[],sets:3,reps:'12–15',rest:60,
+    gifQ:'lateral raise dumbbell side delts exercise',ytSearch:'lateral raise side delts form',
+    desc:'Raise arms out to sides to shoulder height with slight elbow bend. Lower slowly.',
+    tip:'Lead with pinkies slightly raised. Use lighter weight — this is isolation.'},
+  front_raise:{id:'front_raise',name:'DB Front Raise',cat:'shoulders',level:'beginner',equip:'dumbbell',emoji:'⬆️',
+    p:['shoulders'],s:['chest'],sets:3,reps:'12',rest:60,
+    gifQ:'front raise dumbbell anterior delt exercise',ytSearch:'dumbbell front raise anterior deltoid',
+    desc:'Raise arms forward and up to shoulder height. Lower slowly. No swinging.',
+    tip:'No momentum. If you\'re swinging, go lighter.'},
+  bicep_curl:{id:'bicep_curl',name:'DB Bicep Curl',cat:'arms',level:'beginner',equip:'dumbbell',emoji:'💪',
+    p:['biceps'],s:['forearms'],sets:3,reps:'10–12',rest:60,
+    gifQ:'dumbbell bicep curl exercise',ytSearch:'dumbbell bicep curl proper form',
+    desc:'Palms forward. Curl toward shoulders bending only at elbow. Squeeze at top. Lower controlled.',
+    tip:'Upper arms pinned to your sides. No swinging — bicep does all the work.'},
+  hammer_curl:{id:'hammer_curl',name:'Hammer Curl',cat:'arms',level:'beginner',equip:'dumbbell',emoji:'🔨',
+    p:['biceps','forearms'],s:[],sets:3,reps:'10–12',rest:60,
+    gifQ:'hammer curl dumbbell exercise neutral grip',ytSearch:'hammer curl dumbbell form brachialis',
+    desc:'Neutral grip (thumbs up). Curl to shoulders without rotating wrists.',
+    tip:'Hits the brachialis under the bicep. Alternate arms for better focus.'},
+  concentration_curl:{id:'concentration_curl',name:'Concentration Curl',cat:'arms',level:'intermediate',equip:'dumbbell',emoji:'🎯',
+    p:['biceps'],s:[],sets:3,reps:'10 each',rest:60,
+    gifQ:'concentration curl seated dumbbell exercise',ytSearch:'concentration curl seated form',
+    desc:'Seated, brace elbow on inner thigh. Curl slowly. Maximum bicep isolation.',
+    tip:'Go lighter than you think. Full isolation = zero cheating.'},
+  tricep_dips:{id:'tricep_dips',name:'Chair Tricep Dips',cat:'arms',level:'beginner',equip:'bodyweight',emoji:'🪑',
+    p:['triceps'],s:['chest','shoulders'],sets:3,reps:'10–12',rest:60,
+    gifQ:'tricep dips chair exercise',ytSearch:'chair tricep dips form beginner',
+    desc:'Grip chair edge, lower by bending elbows to 90°. Back close to chair. Press to lockout.',
+    tip:'Elbows track back — not flaring out. Upright torso targets triceps more.'},
+  close_grip_pushup:{id:'close_grip_pushup',name:'Close-Grip Push-Up',cat:'arms',level:'intermediate',equip:'bodyweight',emoji:'🤏',
+    p:['triceps','chest'],s:['shoulders'],sets:3,reps:'10–12',rest:90,
+    gifQ:'close grip push up triceps exercise',ytSearch:'close grip push up triceps form',
+    desc:'Hands inside shoulder-width. Elbows stay close to ribs throughout.',
+    tip:'Elbows pinned to ribs = maximum tricep activation.'},
+  overhead_ext:{id:'overhead_ext',name:'DB Overhead Tricep Ext',cat:'arms',level:'beginner',equip:'dumbbell',emoji:'🏋️',
+    p:['triceps'],s:[],sets:3,reps:'12–15',rest:60,
+    gifQ:'overhead tricep extension dumbbell exercise',ytSearch:'dumbbell overhead tricep extension form',
+    desc:'Both hands on dumbbell overhead. Bend only at elbows, lower behind head. Extend back up.',
+    tip:'Upper arms stay still and vertical — only forearms move.'},
+  db_kickback:{id:'db_kickback',name:'DB Tricep Kickback',cat:'arms',level:'intermediate',equip:'dumbbell',emoji:'🦵',
+    p:['triceps'],s:[],sets:3,reps:'12 each',rest:60,
+    gifQ:'tricep kickback dumbbell exercise',ytSearch:'dumbbell tricep kickback form',
+    desc:'Hinge forward, upper arm parallel to floor. Extend forearm back to straight. Hold briefly.',
+    tip:'Hold at full extension for peak contraction. Don\'t rush it.'},
+  plank:{id:'plank',name:'Plank Hold',cat:'core',level:'beginner',equip:'bodyweight',emoji:'🏗️',
+    p:['core','abs'],s:['shoulders','glutes'],sets:3,reps:'30–45 sec',rest:60,
+    gifQ:'plank hold exercise core workout',ytSearch:'plank hold proper form beginner',
+    desc:'Forearms and toes. Rigid line from head to heels. Core braced hard. No sagging or raised hips.',
+    tip:'Perfect 20-second plank beats a sloppy 60-second one every time.'},
+  mountain_climbers:{id:'mountain_climbers',name:'Mountain Climbers',cat:'core',level:'intermediate',equip:'bodyweight',emoji:'🧗',
+    p:['core','abs'],s:['shoulders','hip_flexors'],sets:3,reps:'20 total',rest:60,
+    gifQ:'mountain climbers exercise core workout',ytSearch:'mountain climbers core proper form',
+    desc:'High plank. Drive one knee toward chest then quickly alternate. Hips level throughout.',
+    tip:'Torso should NOT move — all power from your core.'},
+  crunches:{id:'crunches',name:'Crunches',cat:'core',level:'beginner',equip:'bodyweight',emoji:'🪗',
+    p:['abs'],s:['core'],sets:3,reps:'15–20',rest:45,
+    gifQ:'ab crunch exercise workout',ytSearch:'crunch proper form abs',
+    desc:'Knees bent, curl upper body toward knees contracting abs. Only shoulder blades lift off floor.',
+    tip:'Don\'t pull your neck. Your abs do all the work.'},
+  leg_raises:{id:'leg_raises',name:'Lying Leg Raises',cat:'core',level:'intermediate',equip:'bodyweight',emoji:'🦵',
+    p:['abs','hip_flexors'],s:['core'],sets:3,reps:'12–15',rest:60,
+    gifQ:'leg raise exercise ab workout lying down',ytSearch:'lying leg raise lower abs form',
+    desc:'Flat on back, hands under glutes. Legs straight, raise to vertical. Lower slowly without touching floor.',
+    tip:'Lower legs = harder. Start with 45° range if needed.'},
+  bicycle_crunches:{id:'bicycle_crunches',name:'Bicycle Crunches',cat:'core',level:'intermediate',equip:'bodyweight',emoji:'🚲',
+    p:['abs','obliques'],s:['core'],sets:3,reps:'20 total',rest:60,
+    gifQ:'bicycle crunch exercise obliques ab workout',ytSearch:'bicycle crunch obliques form',
+    desc:'Bring one knee in while rotating opposite elbow toward it. Alternate in a cycling motion.',
+    tip:'Slow and deliberate beats fast. Actually rotate your torso — not just your elbow.'},
+  russian_twist:{id:'russian_twist',name:'Russian Twist',cat:'core',level:'intermediate',equip:'dumbbell',emoji:'🌀',
+    p:['obliques','abs'],s:['core'],sets:3,reps:'20 total',rest:60,
+    gifQ:'russian twist dumbbell core exercise',ytSearch:'russian twist dumbbell form',
+    desc:'Seated, feet off floor, torso 45°. Hold dumbbell and rotate torso side to side.',
+    tip:'Rotate your torso — not just your arms.'},
+  burpee:{id:'burpee',name:'Burpee',cat:'fullbody',level:'intermediate',equip:'bodyweight',emoji:'⚡',
+    p:['chest','quads','core'],s:['shoulders','triceps'],sets:3,reps:'8–10',rest:90,
+    gifQ:'burpee exercise full body workout',ytSearch:'burpee proper form full body',
+    desc:'Drop to floor → jump to plank → push-up → jump feet to hands → jump up. One fluid motion.',
+    tip:'Scale by removing push-up or jump. Quality over speed.'},
+  db_thruster:{id:'db_thruster',name:'DB Thruster',cat:'fullbody',level:'intermediate',equip:'dumbbell',emoji:'🚀',
+    p:['quads','shoulders','glutes'],s:['core','triceps'],sets:3,reps:'10',rest:90,
+    gifQ:'dumbbell thruster exercise squat press',ytSearch:'dumbbell thruster squat to press form',
+    desc:'Dumbbells at shoulders. Squat down, drive up explosively pressing dumbbells overhead.',
+    tip:'Power comes from legs — let your lower body drive the press.'},
+  bear_crawl:{id:'bear_crawl',name:'Bear Crawl',cat:'fullbody',level:'intermediate',equip:'bodyweight',emoji:'🐻',
+    p:['core','shoulders'],s:['quads','chest'],sets:3,reps:'20 steps',rest:60,
+    gifQ:'bear crawl exercise core workout',ytSearch:'bear crawl exercise form core',
+    desc:'Hands and knees, hover knees 2 inches off ground. Move with opposite hand and foot. Back flat.',
+    tip:'Slow and deliberate. Your core is working overtime to stay stable.'},
+  high_knees:{id:'high_knees',name:'High Knees',cat:'cardio',level:'beginner',equip:'bodyweight',emoji:'🏃',
+    p:['hip_flexors','quads'],s:['core','calves'],sets:3,reps:'30 sec',rest:45,
+    gifQ:'high knees cardio exercise workout',ytSearch:'high knees exercise cardio form',
+    desc:'Run in place driving knees to hip height. Pump arms. Land on balls of feet.',
+    tip:'Land softly — not flat-footed.'},
+  jumping_jacks:{id:'jumping_jacks',name:'Jumping Jacks',cat:'cardio',level:'beginner',equip:'bodyweight',emoji:'⭐',
+    p:['calves','shoulders'],s:['core','quads'],sets:3,reps:'30–40',rest:45,
+    gifQ:'jumping jacks cardio exercise workout',ytSearch:'jumping jacks proper form cardio',
+    desc:'Jump feet wide while raising arms overhead. Jump back together. Steady rhythm.',
+    tip:'Stay light on your feet. Core braced throughout.'},
+  mountain_climbers_fast:{id:'mountain_climbers_fast',name:'Fast Mountain Climbers',cat:'cardio',level:'intermediate',equip:'bodyweight',emoji:'💨',
+    p:['core','hip_flexors'],s:['shoulders','quads'],sets:4,reps:'30 sec',rest:30,
+    gifQ:'fast mountain climbers cardio hiit exercise',ytSearch:'fast mountain climbers HIIT cardio',
+    desc:'Mountain climbers at maximum speed. Keep hips low and drive knees fast.',
+    tip:'If form breaks, slow down. Speed means nothing without control.'}
+};
+
+// ═══════════════════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════════════════
+const TEMPLATES = {
+  beg3:{name:'3-Day Beginner',sub:'Push · Lower · Pull — 5 exercises per day',
+    days:[
+      {name:'Day 1 — Push + Core',exIds:['push_up','wide_push_up','pike_pushup','tricep_dips','plank']},
+      {name:'Day 2 — Lower Body',exIds:['squat','reverse_lunge','glute_bridge','calf_raise','sumo_squat']},
+      {name:'Day 3 — Pull + Core',exIds:['inverted_row','superman','good_morning','crunches','bicycle_crunches']}
+    ]},
+  int3:{name:'3-Day Intermediate',sub:'Dumbbell compound focus — 5 exercises per day',
+    days:[
+      {name:'Day 1 — Push',exIds:['diamond_push_up','db_floor_press','db_shoulder_press','close_grip_pushup','overhead_ext']},
+      {name:'Day 2 — Lower',exIds:['goblet_squat','db_rdl','reverse_lunge','jump_squat','calf_raise']},
+      {name:'Day 3 — Pull + Core',exIds:['db_row','inverted_row','russian_twist','leg_raises','mountain_climbers']}
+    ]},
+  exp3:{name:'3-Day Expert',sub:'Max intensity — compound + explosive movements',
+    days:[
+      {name:'Day 1 — Push',exIds:['diamond_push_up','db_floor_press','db_chest_fly','db_shoulder_press','lateral_raise']},
+      {name:'Day 2 — Lower + Power',exIds:['goblet_squat','db_rdl','jump_squat','burpee','db_thruster']},
+      {name:'Day 3 — Pull + Core',exIds:['db_row','inverted_row','concentration_curl','leg_raises','russian_twist']}
+    ]},
+  chest:{name:'Chest Day',sub:'Full chest focus',
+    days:[{name:'Chest Session',exIds:['push_up','wide_push_up','diamond_push_up','db_floor_press','db_chest_fly']}]},
+  back:{name:'Back Day',sub:'Rows and posterior chain',
+    days:[{name:'Back Session',exIds:['inverted_row','db_row','superman','db_rdl','good_morning']}]},
+  legs:{name:'Leg Day',sub:'Quads, glutes, hamstrings',
+    days:[{name:'Leg Session',exIds:['squat','goblet_squat','reverse_lunge','sumo_squat','glute_bridge','calf_raise']}]},
+  shoulders:{name:'Shoulder Day',sub:'Presses and raises',
+    days:[{name:'Shoulder Session',exIds:['pike_pushup','db_shoulder_press','lateral_raise','front_raise']}]},
+  arms:{name:'Arms Day',sub:'Biceps + triceps',
+    days:[{name:'Arms Session',exIds:['bicep_curl','hammer_curl','concentration_curl','tricep_dips','overhead_ext','db_kickback']}]},
+  core:{name:'Core Day',sub:'Complete ab training',
+    days:[{name:'Core Session',exIds:['plank','mountain_climbers','crunches','leg_raises','bicycle_crunches','russian_twist']}]},
+  fullbody:{name:'Full Body',sub:'Every muscle group',
+    days:[{name:'Full Body Session',exIds:['push_up','squat','inverted_row','db_shoulder_press','plank','burpee']}]},
+  cardio:{name:'Cardio HIIT',sub:'Max burn and conditioning',
+    days:[{name:'HIIT Session',exIds:['jumping_jacks','high_knees','jump_squat','burpee','mountain_climbers_fast']}]}
+};
+
+// ═══════════════════════════════════════════
+// MUSCLE SVG BODY DIAGRAM
+// ═══════════════════════════════════════════
+function mc(m,p,s){return p.includes(m)?'#ff3b1e':s.includes(m)?'#ff9800':'#1a1a28'}
+function ms(m,p,s){return p.includes(m)?'#ff6b50':s.includes(m)?'#ffb040':'#252535'}
+
+function bodyDiagram(primary,secondary){
+  const f=(m)=>mc(m,primary,secondary);
+  const k=(m)=>ms(m,primary,secondary);
+  const front=`<svg viewBox="0 0 100 240" xmlns="http://www.w3.org/2000/svg" style="width:88px;height:auto">
+    <ellipse cx="50" cy="13" rx="11" ry="12" fill="#14141e" stroke="#252535" stroke-width="0.7"/>
+    <rect x="45" y="24" width="10" height="7" rx="2" fill="#14141e"/>
+    <ellipse cx="26" cy="37" rx="9" ry="7" fill="${f('shoulders')}" stroke="${k('shoulders')}" stroke-width="0.6" opacity="0.9"/>
+    <ellipse cx="74" cy="37" rx="9" ry="7" fill="${f('shoulders')}" stroke="${k('shoulders')}" stroke-width="0.6" opacity="0.9"/>
+    <path d="M30,31 L70,31 L73,83 L27,83 Z" fill="#14141e" stroke="#252535" stroke-width="0.5"/>
+    <path d="M32,33 L50,31 L68,33 L70,63 L50,66 L30,63 Z" fill="${f('chest')}" stroke="${k('chest')}" stroke-width="0.5" opacity="0.88"/>
+    <ellipse cx="24" cy="52" rx="6" ry="15" fill="${f('biceps')}" stroke="${k('biceps')}" stroke-width="0.5" opacity="0.9"/>
+    <ellipse cx="76" cy="52" rx="6" ry="15" fill="${f('biceps')}" stroke="${k('biceps')}" stroke-width="0.5" opacity="0.9"/>
+    <ellipse cx="21" cy="53" rx="4" ry="13" fill="${f('triceps')}" opacity="0.7"/>
+    <ellipse cx="79" cy="53" rx="4" ry="13" fill="${f('triceps')}" opacity="0.7"/>
+    <path d="M21,33 L30,33 L33,70 L18,70 Z" fill="#14141e" stroke="#252535" stroke-width="0.4"/>
+    <path d="M70,33 L79,33 L82,70 L67,70 Z" fill="#14141e" stroke="#252535" stroke-width="0.4"/>
+    <path d="M27,83 L73,83 L69,100 L31,100 Z" fill="#14141e"/>
+    <rect x="37" y="65" width="26" height="33" rx="3" fill="${f('abs')}" stroke="${k('abs')}" stroke-width="0.5" opacity="0.82"/>
+    <rect x="36" y="65" width="28" height="35" rx="4" fill="${f('core')}" opacity="0.4"/>
+    <ellipse cx="38" cy="97" rx="8" ry="6" fill="${f('hip_flexors')}" opacity="0.85"/>
+    <ellipse cx="62" cy="97" rx="8" ry="6" fill="${f('hip_flexors')}" opacity="0.85"/>
+    <path d="M17,71 L32,71 L29,95 L14,95 Z" fill="#14141e"/>
+    <path d="M68,71 L83,71 L86,95 L71,95 Z" fill="#14141e"/>
+    <path d="M29,100 L49,100 L46,164 L26,164 Z" fill="${f('quads')}" stroke="${k('quads')}" stroke-width="0.5" opacity="0.85"/>
+    <path d="M51,100 L71,100 L74,164 L54,164 Z" fill="${f('quads')}" stroke="${k('quads')}" stroke-width="0.5" opacity="0.85"/>
+    <ellipse cx="43" cy="132" rx="5" ry="22" fill="${f('inner_thigh')}" opacity="0.65"/>
+    <ellipse cx="57" cy="132" rx="5" ry="22" fill="${f('inner_thigh')}" opacity="0.65"/>
+    <path d="M25,166 L46,166 L43,222 L22,222 Z" fill="#14141e"/>
+    <path d="M54,166 L75,166 L78,222 L57,222 Z" fill="#14141e"/>
+    <ellipse cx="33" cy="192" rx="8" ry="20" fill="${f('calves')}" opacity="0.72"/>
+    <ellipse cx="67" cy="192" rx="8" ry="20" fill="${f('calves')}" opacity="0.72"/>
+  </svg>`;
+
+  const back=`<svg viewBox="0 0 100 240" xmlns="http://www.w3.org/2000/svg" style="width:88px;height:auto">
+    <ellipse cx="50" cy="13" rx="11" ry="12" fill="#14141e" stroke="#252535" stroke-width="0.7"/>
+    <rect x="45" cy="24" width="10" height="7" rx="2" fill="#14141e"/>
+    <ellipse cx="26" cy="37" rx="9" ry="7" fill="${f('rear_delt')}" stroke="${k('rear_delt')}" stroke-width="0.5" opacity="0.9"/>
+    <ellipse cx="74" cy="37" rx="9" ry="7" fill="${f('rear_delt')}" stroke="${k('rear_delt')}" stroke-width="0.5" opacity="0.9"/>
+    <path d="M36,31 L50,29 L64,31 L62,53 L50,56 L38,53 Z" fill="${f('upper_back')}" stroke="${k('upper_back')}" stroke-width="0.5" opacity="0.88"/>
+    <path d="M27,46 L38,52 L36,80 L23,74 Z" fill="${f('back')}" stroke="${k('back')}" stroke-width="0.5" opacity="0.88"/>
+    <path d="M73,46 L62,52 L64,80 L77,74 Z" fill="${f('back')}" stroke="${k('back')}" stroke-width="0.5" opacity="0.88"/>
+    <ellipse cx="23" cy="52" rx="6" ry="16" fill="${f('triceps')}" stroke="${k('triceps')}" stroke-width="0.5" opacity="0.88"/>
+    <ellipse cx="77" cy="52" rx="6" ry="16" fill="${f('triceps')}" stroke="${k('triceps')}" stroke-width="0.5" opacity="0.88"/>
+    <rect x="38" y="68" width="24" height="22" rx="3" fill="${f('lower_back')}" stroke="${k('lower_back')}" stroke-width="0.5" opacity="0.85"/>
+    <ellipse cx="37" cy="97" rx="12" ry="10" fill="${f('glutes')}" stroke="${k('glutes')}" stroke-width="0.5" opacity="0.88"/>
+    <ellipse cx="63" cy="97" rx="12" ry="10" fill="${f('glutes')}" stroke="${k('glutes')}" stroke-width="0.5" opacity="0.88"/>
+    <path d="M30,103 L48,103 L45,160 L27,160 Z" fill="${f('hamstrings')}" stroke="${k('hamstrings')}" stroke-width="0.5" opacity="0.85"/>
+    <path d="M52,103 L70,103 L73,160 L55,160 Z" fill="${f('hamstrings')}" stroke="${k('hamstrings')}" stroke-width="0.5" opacity="0.85"/>
+    <ellipse cx="33" cy="192" rx="10" ry="22" fill="${f('calves')}" stroke="${k('calves')}" stroke-width="0.5" opacity="0.85"/>
+    <ellipse cx="67" cy="192" rx="10" ry="22" fill="${f('calves')}" stroke="${k('calves')}" stroke-width="0.5" opacity="0.85"/>
+  </svg>`;
+
+  return `<div class="diag-wrap">
+    <div class="diag-side"><div class="diag-lbl">Front</div>${front}</div>
+    <div class="diag-side"><div class="diag-lbl">Back</div>${back}</div>
+  </div>
+  <div class="diag-legend">
+    ${primary.length?`<div class="leg-item"><span class="leg-dot" style="background:#ff3b1e"></span>Primary</div>`:''}
+    ${secondary.length?`<div class="leg-item"><span class="leg-dot" style="background:#ff9800"></span>Secondary</div>`:''}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+// LEVEL BADGE
+// ═══════════════════════════════════════════
+function lvBadge(lv){
+  if(lv==='beginner')return '<span class="lv lv-b">Beginner</span>';
+  if(lv==='intermediate')return '<span class="lv lv-i">Intermediate</span>';
+  return '<span class="lv lv-e">Expert</span>';
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+function tab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  if(btn) btn.classList.add('on');
+}
+
+// ═══════════════════════════════════════════
+// LIBRARY
+// ═══════════════════════════════════════════
+let libFilter='all';
+
+function renderLib(){
+  const list=document.getElementById('lib-list');
+  const exList=Object.values(EX).filter(e=>{
+    if(['beginner','intermediate','expert'].includes(libFilter)) return e.level===libFilter;
+    if(libFilter==='all') return true;
+    return e.cat===libFilter;
+  });
+  list.innerHTML=exList.map((e,i)=>`
+    <div class="ec" id="ec-${e.id}">
+      <div class="ec-hdr" onclick="toggleEx('${e.id}')">
+        <div class="ec-emoji">${e.emoji}</div>
+        <div class="ec-info">
+          <div class="ec-name">${e.name}</div>
+          <div class="ec-tags">
+            ${lvBadge(e.level)}
+            <span class="mtag">${e.equip}</span>
+            ${e.p.map(m=>`<span class="mtag">${m.replace(/_/g,' ')}</span>`).join('')}
+          </div>
+        </div>
+        <div class="ec-arr">›</div>
+      </div>
+      <div class="ec-body" id="ecb-${e.id}">
+        ${bodyDiagram(e.p,e.s)}
+        <div class="gif-wrap" id="gif-${e.id}">
+          <div class="gif-loading"><div class="gif-spinner"></div><div class="gif-lbl">Loading demo…</div></div>
+        </div>
+        <p class="ex-desc">${e.desc}</p>
+        <div class="ex-tip">💡 ${e.tip}</div>
+        <div class="sets-info">📋 ${e.sets} sets × ${e.reps} &nbsp;·&nbsp; Rest: ${e.rest}s</div>
+        <a class="btn-yt" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.ytSearch)}" target="_blank" rel="noopener">
+          <svg width="14" height="10" viewBox="0 0 16 11"><path d="M15.665 1.75A2 2 0 0 0 14.254.328C13.02 0 8 0 8 0S2.98 0 1.746.328A2 2 0 0 0 .335 1.75C0 3 0 5.5 0 5.5s0 2.5.335 3.75a2 2 0 0 0 1.411 1.422C2.98 11 8 11 8 11s5.02 0 6.254-.328a2 2 0 0 0 1.411-1.422C16 8 16 5.5 16 5.5s0-2.5-.335-3.75zm-9.29 6.08V3.17l4.18 2.33-4.18 2.33z" fill="white"/></svg>
+          Find Tutorial on YouTube ↗
+        </a>
+      </div>
+    </div>`).join('');
+}
+
+function toggleEx(id){
+  const card=document.getElementById('ec-'+id);
+  const wasOpen=card.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.ec.open').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen){
+    card.classList.add('open');
+    const e=EX[id];
+    if(e) fetchGif(e.gifQ,'gif-'+id);
+  }
+}
+
+function filterLib(f,el){
+  libFilter=f;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderLib();
+}
+
+// ═══════════════════════════════════════════
+// TEMPLATE PREVIEW
+// ═══════════════════════════════════════════
+let currentPreviewExIds=[];
+
+function previewTemplate(key){
+  const t=TEMPLATES[key];
+  document.getElementById('tmpl-list').style.display='none';
+  const prev=document.getElementById('tmpl-preview');
+  prev.style.display='block';
+  document.getElementById('prev-title').textContent=t.name;
+  document.getElementById('prev-sub').textContent=t.sub;
+  currentPreviewExIds=t.days[0].exIds;
+
+  const daysHtml=t.days.map(d=>`
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-family:var(--fh);font-size:18px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">${d.name}</div>
+      ${d.exIds.map((eid,i)=>{
+        const e=EX[eid];if(!e)return'';
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;
+          ${i<d.exIds.length-1?'border-bottom:1px solid var(--b)':''}">
+          <span style="font-size:20px">${e.emoji}</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500">${e.name}</div>
+            <div style="font-size:11px;color:var(--mut)">${e.sets}×${e.reps}</div>
+          </div>
+          ${lvBadge(e.level)}
+        </div>`;
+      }).join('')}
+      <button onclick="startSession(${JSON.stringify(d.exIds)})"
+        style="width:100%;margin-top:12px;background:var(--card2);border:1px solid var(--b);color:var(--txt);
+        font-family:var(--fh);font-size:14px;letter-spacing:2px;padding:11px;border-radius:var(--rs);cursor:pointer">
+        START THIS DAY →</button>
+    </div>`).join('');
+  document.getElementById('prev-days').innerHTML=daysHtml;
+  window.scrollTo(0,0);
+}
+
+function closeTmplPreview(){
+  document.getElementById('tmpl-list').style.display='block';
+  document.getElementById('tmpl-preview').style.display='none';
+}
+
+// ═══════════════════════════════════════════
+// CUSTOM BUILDER
+// ═══════════════════════════════════════════
+let customSelected=[];
+
+function openBuilder(){
+  customSelected=[];
+  document.getElementById('tmpl-list').style.display='none';
+  const prev=document.getElementById('tmpl-preview');
+  prev.style.display='block';
+  document.getElementById('prev-title').textContent='Build Custom Workout';
+  document.getElementById('prev-sub').textContent='Tap exercises to select, then hit Start';
+
+  const cats=['chest','back','legs','shoulders','arms','core','fullbody','cardio'];
+  let html='<div style="padding-bottom:80px">';
+  cats.forEach(cat=>{
+    const exs=Object.values(EX).filter(e=>e.cat===cat);
+    if(!exs.length)return;
+    html+=`<div class="sec-div">${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>`;
+    exs.forEach(e=>{
+      html+=`<div class="ec" id="sel-${e.id}" onclick="toggleSel('${e.id}')">
+        <div class="ec-hdr" style="pointer-events:none">
+          <div class="ec-emoji">${e.emoji}</div>
+          <div class="ec-info">
+            <div class="ec-name">${e.name}</div>
+            <div class="ec-tags">${lvBadge(e.level)}<span class="mtag">${e.sets}×${e.reps}</span></div>
+          </div>
+          <div id="sm-${e.id}" class="sel-mark">○</div>
+        </div>
+      </div>`;
+    });
+  });
+  html+='</div>';
+  document.getElementById('prev-days').innerHTML=html+
+    `<div style="position:fixed;bottom:0;left:0;right:0;background:var(--surf);
+      border-top:1px solid var(--b);padding:12px 14px;z-index:100">
+      <div style="max-width:520px;margin:0 auto;display:flex;align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--mut);flex:1" id="sel-count">0 selected</span>
+        <button onclick="startCustom()" style="background:var(--acc);border:none;color:#fff;
+          font-family:var(--fh);font-size:15px;letter-spacing:2px;padding:12px 20px;
+          border-radius:var(--rs);cursor:pointer">START →</button>
+      </div>
+    </div>`;
+}
+
+function toggleSel(id){
+  const idx=customSelected.indexOf(id);
+  const mark=document.getElementById('sm-'+id);
+  const card=document.getElementById('sel-'+id);
+  if(idx===-1){
+    customSelected.push(id);
+    if(mark)mark.textContent='✅';
+    card.style.borderColor='var(--ok)';
+  } else {
+    customSelected.splice(idx,1);
+    if(mark)mark.textContent='○';
+    card.style.borderColor='';
+  }
+  const cnt=document.getElementById('sel-count');
+  if(cnt)cnt.textContent=customSelected.length+' exercise'+(customSelected.length!==1?'s':'')+' selected';
+}
+
+function startCustom(){
+  if(!customSelected.length){alert('Select at least one exercise!');return;}
+  startSession([...customSelected]);
+}
+
+// ═══════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════
+let sessExIds=[], setsDone={};
+
+function startSession(exIds){
+  if(!exIds||!exIds.length)return;
+  sessExIds=exIds;setsDone={};
+  document.getElementById('sess-empty').style.display='none';
+  document.getElementById('sess-active').style.display='block';
+  document.getElementById('done-banner').style.display='none';
+  document.getElementById('sess-title').textContent='Active Session';
+  document.getElementById('sess-sub').textContent=exIds.length+' exercises';
+  buildSessExercises();
+  updateProg();
+  tab('session',document.querySelectorAll('.tb')[2]);
+  window.scrollTo(0,0);
+}
+
+function buildSessExercises(){
+  const c=document.getElementById('sess-exercises');
+  c.innerHTML=sessExIds.map((eid,i)=>{
+    const e=EX[eid];if(!e)return'';
+    let sHtml='';
+    for(let s=1;s<=e.sets;s++){
+      sHtml+=`<div class="set-chip" id="ss${i}_${s}" onclick="toggleSet(${i},${s},${e.sets},'${e.reps}')">
+        <div class="set-lbl">Set ${s}</div><div class="set-val">${e.reps}</div>
+      </div>`;
+    }
+    return `<div class="sx-card ${i===0?'open':''}" id="sxc${i}">
+      <div class="sx-head" onclick="document.getElementById('sxc${i}').classList.toggle('open')">
+        <div class="sx-num">${String(i+1).padStart(2,'0')}</div>
+        <div>
+          <div class="sx-name">${e.name}</div>
+          <div style="font-size:11px;color:var(--mut)">${e.sets}×${e.reps} · ${e.p.map(m=>m.replace(/_/g,' ')).join(', ')}</div>
+        </div>
+        <div id="sxd${i}" style="font-size:18px;margin-left:auto"></div>
+      </div>
+      <div class="sx-body">
+        <div class="sets-row">${sHtml}</div>
+        <div class="sx-actions">
+          <a class="btn-yt-sm" href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.ytSearch)}" target="_blank" rel="noopener">
+            <svg width="14" height="10" viewBox="0 0 16 11"><path d="M15.665 1.75A2 2 0 0 0 14.254.328C13.02 0 8 0 8 0S2.98 0 1.746.328A2 2 0 0 0 .335 1.75C0 3 0 5.5 0 5.5s0 2.5.335 3.75a2 2 0 0 0 1.411 1.422C2.98 11 8 11 8 11s5.02 0 6.254-.328a2 2 0 0 0 1.411-1.422C16 8 16 5.5 16 5.5s0-2.5-.335-3.75zm-9.29 6.08V3.17l4.18 2.33-4.18 2.33z" fill="white"/></svg>
+            Demo on YouTube ↗
+          </a>
+          <button class="btn-rest" onclick="startRestTimer()">⏱ Rest</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSet(exIdx,setNum,totalSets,reps){
+  const key=exIdx+'_'+setNum;
+  setsDone[key]=!setsDone[key];
+  const chip=document.getElementById('ss'+exIdx+'_'+setNum);
+  if(setsDone[key]){chip.classList.add('on');chip.querySelector('.set-val').textContent='✓';}
+  else{chip.classList.remove('on');chip.querySelector('.set-val').textContent=reps;}
+  let allDone=true;
+  for(let s=1;s<=totalSets;s++){if(!setsDone[exIdx+'_'+s]){allDone=false;break;}}
+  const card=document.getElementById('sxc'+exIdx);
+  const icon=document.getElementById('sxd'+exIdx);
+  if(allDone){
+    card.classList.add('done-c');
+    if(icon)icon.textContent='✅';
+    const next=document.getElementById('sxc'+(exIdx+1));
+    if(next&&!next.classList.contains('open'))next.classList.add('open');
+    startRestTimer();
+  } else {
+    card.classList.remove('done-c');
+    if(icon)icon.textContent='';
+  }
+  updateProg();
+}
+
+function updateProg(){
+  let total=0,done=0;
+  sessExIds.forEach((eid,i)=>{
+    const e=EX[eid];if(!e)return;
+    total+=e.sets;
+    for(let s=1;s<=e.sets;s++){if(setsDone[i+'_'+s])done++;}
+  });
+  const pct=total?Math.round((done/total)*100):0;
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+  if(pct===100){
+    document.getElementById('done-banner').style.display='block';
+    document.getElementById('done-banner').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+function endSession(){
+  if(!confirm('End session?'))return;
+  document.getElementById('sess-active').style.display='none';
+  document.getElementById('sess-empty').style.display='block';
+}
+
+// ═══════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════
+let timerSecs=90,timerLeft=90,timerRunning=false,timerInterval=null;
+
+function setPre(s,el){
+  timerSecs=s;timerLeft=s;
+  clearInterval(timerInterval);timerRunning=false;
+  document.getElementById('t-btn').textContent='START';
+  document.getElementById('t-stat').textContent='Ready';
+  document.getElementById('t-num').style.color='var(--acc)';
+  document.querySelectorAll('.pre-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');renderTimer();
+}
+
+function toggleTimer(){
+  if(timerRunning){
+    clearInterval(timerInterval);timerRunning=false;
+    document.getElementById('t-btn').textContent='RESUME';
+    document.getElementById('t-stat').textContent='Paused';
+  } else runTimer();
+}
+
+function runTimer(){
+  timerRunning=true;
+  document.getElementById('t-btn').textContent='PAUSE';
+  document.getElementById('t-stat').textContent='Resting… 🧘';
+  clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{
+    timerLeft--;renderTimer();
+    if(timerLeft<=3&&timerLeft>0)document.getElementById('t-num').style.color='var(--acc2)';
+    if(timerLeft<=0){
+      clearInterval(timerInterval);timerRunning=false;
+      document.getElementById('t-num').style.color='var(--ok)';
+      document.getElementById('t-stat').textContent='✅ Rest done — back to work!';
+      document.getElementById('t-btn').textContent='START';
+      setTimeout(()=>{
+        timerLeft=timerSecs;
+        document.getElementById('t-num').style.color='var(--acc)';
+        document.getElementById('t-stat').textContent='Ready';
+        renderTimer();
+        tab('session',document.querySelectorAll('.tb')[2]);
+      },2000);
+    }
+  },1000);
+}
+
+function resetTimer(){
+  clearInterval(timerInterval);timerRunning=false;timerLeft=timerSecs;
+  document.getElementById('t-btn').textContent='START';
+  document.getElementById('t-stat').textContent='Ready';
+  document.getElementById('t-num').style.color='var(--acc)';
+  renderTimer();
+}
+
+function startRestTimer(){
+  timerLeft=timerSecs;
+  document.getElementById('t-num').style.color='var(--acc)';
+  renderTimer();
+  clearInterval(timerInterval);timerRunning=false;
+  runTimer();
+  tab('timer',document.querySelectorAll('.tb')[3]);
+}
+
+function renderTimer(){
+  const m=String(Math.floor(timerLeft/60)).padStart(2,'0');
+  const s=String(timerLeft%60).padStart(2,'0');
+  document.getElementById('t-num').textContent=m+':'+s;
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderLib();
+renderTimer();
+</script>
+</body>
+</html>
